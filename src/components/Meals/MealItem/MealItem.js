@@ -6,7 +6,7 @@ import CartContext from "../../../store/cart-context";
 
 const MealItem = (props) => {
   const cartCtx = useContext(CartContext);
-  const price = `$${props.price.toFixed(2)}`; //this will simply make sure that we always render two decimal places
+  const price = `$${props.price.toFixed(2)}`;
 
   const addToCartHandler = (amount) => {
     cartCtx.addItem({
@@ -14,9 +14,8 @@ const MealItem = (props) => {
       name: props.name,
       amount: amount,
       price: props.price,
-    }); // CartProvider'daki cartContext'in icinde addItem: addItemToCartHandler seklinde tanimli bu functiona ulastik
-  }; // here I reach my context (CartProvider icinde)
-  // with this we should be triggering that context method whenever that form is submitted.and that should then add items to the Cart
+    });
+  };
 
   return (
     <li className={classes.meal}>
