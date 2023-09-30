@@ -1,22 +1,40 @@
 import CartContext from "./cart-context";
 import { useReducer } from "react";
-// useReducer kullanicaz cunku biraz complex state. once eklenmek istenen item daha once eklenmis mi diye bakicak varsa amountunu guncellicek yoksa yeni olusturcak, removing de oldukca complex
+
 const defaultCartState = {
   items: [],
   totalAmount: 0,
-}; // default state olusturduk
+};
 
-// reducer functioni componentin disina yaziyoruz
-// cartReducer functioni, state snapshot (updated object) ve dispatch edilen actioni alip yeni bir state snapshot veriyor
 const cartReducer = (state, action) => {
   if (action.type === "ADD") {
-    //gelen actionin typeina gore return edicek
-    const updatedItems = state.items.concat(action.item); // updatedItems arrayimiz olsun.  concat, actiondan gelen itemi ekleyerek yeni bir array olusturur. bu action.item’da name, amount gibi gerekli tum datalar var.
     const updatedTotalAmount =
       state.totalAmount + action.item.price * action.item.amount;
-    //actiondan gelen itemin amountu ile priceini carpip toplama ekliyor
+
+    // I wanna check if an item is already part of the cart
+    const existingCartItemIndex = state.items.findIndex(
+      (item) => item.id === action.item.id
+    ); // this will return us the index of that item if it exist
+    const existingCartItem = state.items[existingCartItemIndex]; // this will only work if we have that item already, otherwise it would be null
+
+    let updatedItems;
+
+    if (existingCartItem) {
+      // check if an item is already part of the cart items array
+      // if existingCartItem is a thing, if this is truthy, which will only be the case if it's already part of the array
+      const updatedItem = {
+        ...existingCartItem,
+        amount: existingCartItem.amount + action.item.amount,
+      };
+      updatedItems = [...state.items];
+      updatedItems[existingCartItemIndex] = updatedItem;
+    } else {
+      // if an item is added for the first time to that cart items array
+      updatedItems = state.items.concat(action.item); // updatedItems arrayimiz. concat, actiondan gelen itemi ekleyerek yeni bir array olusturur. bu action.item’da name, amount gibi gerekli tum datalar var.
+    }
+
     return {
-      //new state
+      //new state snapshot
       items: updatedItems,
       totalAmount: updatedTotalAmount,
     };
@@ -28,10 +46,10 @@ const CartProvider = (props) => {
   const [cartState, dispatchCartAction] = useReducer(
     cartReducer,
     defaultCartState
-  ); //useReducer, cartState’i (state snapshot’i) ve actioni alip dispatchCartAction ile cartReducer’a gonderiyor ve cartReducer new state snapshot return ediyor. defaultCartState de state snapshot icin initial deger
+  );
 
   const addItemToCartHandler = (item) => {
-    dispatchCartAction({ type: "ADD", item: item }); //cartReducera itemi icinde bulunduran bir action gonderiyor
+    dispatchCartAction({ type: "ADD", item: item });
   };
 
   const removeItemFromCartHandler = (id) => {
@@ -39,18 +57,17 @@ const CartProvider = (props) => {
   };
 
   const cartContext = {
-    items: cartState.items, //contexti update etmis oluyorum
-    totalAmount: cartState.totalAmount, //contexti update etmis oluyorum
+    items: cartState.items,
+    totalAmount: cartState.totalAmount,
     addItem: addItemToCartHandler,
     removeItem: removeItemFromCartHandler,
   };
-  // update edilen context, latest state snapshot
+  //latest state snapshot
 
   return (
     <CartContext.Provider value={cartContext}>
       {props.children}
     </CartContext.Provider>
-    // boyle yazarak butun childlarin value'ya yazdigimiz cartContext'e yani latest snapshota ulasmasini sagladik
   );
 };
 
