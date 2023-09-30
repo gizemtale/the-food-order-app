@@ -1,6 +1,7 @@
 import { useContext } from "react";
 
 import Modal from "../UI/Modal";
+import CartItem from "./CartItem";
 import classes from "./Cart.module.css";
 import CartContext from "../../store/cart-context";
 
@@ -8,13 +9,26 @@ const Cart = (props) => {
   const cartCtx = useContext(CartContext); // to get access to CartContext
 
   const totalAmount = `$${cartCtx.totalAmount.toFixed(2)}`; // I'll call toFixed(2) here to make sure that we always have two decimal places
-  const hasItems = cartCtx.items.length > 0; // simply check if CartContext has length greater than zero so if there are items in the cart
+  const hasItems = cartCtx.items.length > 0; // simply check if there are items in the cart
+
+  const cartItemRemoveHandler = (id) => {};
+
+  const cartItemAddHandler = (item) => {};
 
   const cartItems = (
     <ul className={classes["cart-items"]}>
       {/* //instead of hard coded array of cart items, now we can access cartCtx.items to transform these items to items in the Cart */}
       {cartCtx.items.map((item) => (
-        <li>{item.name}</li>
+        <CartItem
+          key={item.id} // we need to pass a key since its a list
+          name={item.name}
+          amount={item.amount}
+          price={item.price}
+          onRemove={cartItemRemoveHandler.bind(null, item.id)} // CartItem.jsin icindeki <button onClick={props.onRemove}>−</button> ile eslesiyor
+          // bind ensures that the id of the to be added or removed item is passed here to remove handler
+          onAdd={cartItemAddHandler.bind(null, item)} //here you should also call bind and pass the overall item
+          // bind pre-configure as a function for future execution and basically allows you to pre-configure the argument that function will receive when it's being executed. and that's something we need here to ensure that both these functions do receive the ID or the item respectively
+        />
       ))}
     </ul>
   );

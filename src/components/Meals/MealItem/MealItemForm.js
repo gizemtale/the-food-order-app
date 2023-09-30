@@ -12,8 +12,9 @@ const MealItemForm = (props) => {
     event.preventDefault();
 
     const enteredAmount = amountInputRef.current.value; //bununla inputa girilen value'ya ulasiyoruz.
-    const enteredAmountNumber = +enteredAmount; // girilen value sayi bile olsa hep string oldugu icin burada numbera ceviriyoruz
+    const enteredAmountNumber = +enteredAmount; // girilen value sayi bile olsa hep string oldugu icin burada numbera ceviriyoruz. string numberi, number numbera cevirdik
 
+    //validation check
     if (
       enteredAmount.trim().length === 0 ||
       enteredAmountNumber < 1 ||
