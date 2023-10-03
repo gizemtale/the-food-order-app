@@ -14,14 +14,13 @@ const cartReducer = (state, action) => {
     // I wanna check if an item is already part of the cart
     const existingCartItemIndex = state.items.findIndex(
       (item) => item.id === action.item.id
-    ); // this will return us the index of that item if it exist
-    const existingCartItem = state.items[existingCartItemIndex]; // this will only work if we have that item already, otherwise it would be null
+    );
+    const existingCartItem = state.items[existingCartItemIndex];
 
     let updatedItems;
 
     if (existingCartItem) {
       // check if an item is already part of the cart items array
-      // if existingCartItem is a thing, if this is truthy, which will only be the case if it's already part of the array
       const updatedItem = {
         ...existingCartItem,
         amount: existingCartItem.amount + action.item.amount,
@@ -30,11 +29,30 @@ const cartReducer = (state, action) => {
       updatedItems[existingCartItemIndex] = updatedItem;
     } else {
       // if an item is added for the first time to that cart items array
-      updatedItems = state.items.concat(action.item); // updatedItems arrayimiz. concat, actiondan gelen itemi ekleyerek yeni bir array olusturur. bu action.item’da name, amount gibi gerekli tum datalar var.
+      updatedItems = state.items.concat(action.item);
     }
 
     return {
-      //new state snapshot
+      items: updatedItems,
+      totalAmount: updatedTotalAmount,
+    };
+  }
+  if (action.type === "REMOVE") {
+    const existingCartItemIndex = state.items.findIndex(
+      (item) => item.id === action.id
+    );
+    const existingItem = state.items[existingCartItemIndex];
+
+    const updatedTotalAmount = state.totalAmount - existingItem.price;
+    let updatedItems;
+    if (existingItem.amount === 1) {
+      updatedItems = state.items.filter((item) => item.id !== action.id);
+    } else {
+      const updatedItem = { ...existingItem, amount: existingItem.amount - 1 };
+      updatedItems = [...state.items];
+      updatedItems[existingCartItemIndex] = updatedItem;
+    }
+    return {
       items: updatedItems,
       totalAmount: updatedTotalAmount,
     };
@@ -62,7 +80,6 @@ const CartProvider = (props) => {
     addItem: addItemToCartHandler,
     removeItem: removeItemFromCartHandler,
   };
-  //latest state snapshot
 
   return (
     <CartContext.Provider value={cartContext}>

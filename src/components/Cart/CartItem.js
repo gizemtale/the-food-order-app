@@ -1,7 +1,7 @@
 import classes from "./CartItem.module.css";
 
 const CartItem = (props) => {
-  const price = `$${props.price.toFixed(2)}`; // toFixe(2) to force this to all these have two decimal places
+  const price = `$${props.price.toFixed(2)}`;
 
   return (
     <li className={classes["cart-item"]}>
